@@ -14,6 +14,29 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
         display: block;
       }
 
+
+      .maininput {
+        width: 60%;
+        margin: 20px 20px 0px 20px;
+        height: 150px;
+        border: 2px solid  #E6E6E6;
+        font-family: 'Arvo', serif;
+        font-size: 24px;
+        background-color: transparent;
+        padding: 10px 10px 10px 14px;
+        border-radius: 0px;
+        outline: 0;
+        border-style:solid;
+        -webkit-appearance: none;
+            resize: none;
+
+      }
+
+      .maininput:focus {
+        border: 2px solid  #FF5454;
+
+      }
+
       @media (max-width: 600px) {
         h1.paper-font-display1 {
           font-size: 24px;
@@ -25,7 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       limit-to-first="3"
       location="https://spreadit.firebaseio.com/messages"
       data="{{messages}}" id="fbtest"></firebase-collection>
-    <input class="paper-font-body2" value="{{greeting::input}}">
+    <textarea class="maininput" value="{{greeting::input}}" placeholder="Write your message"></textarea>
     <button on-tap="saveMess">save</button>
   </template>
 </dom-module>
