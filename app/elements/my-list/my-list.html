@@ -16,12 +16,14 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
   <template>
     <firebase-collection
-      limit-to-first="3"
-      location="https://spreadit.firebaseio.com/messages"
-      data="{{messages}}" ref="" log></firebase-collection>
-      <template is="dom-repeat" items="[[messages]]" as="message">
-      <h4>[[message.mess]]</h4>
-      <span>[[message.__firebaseKey__]]</span>
+      limit-to-first="100"
+      location="https://spreadit.firebaseio.com/locations"
+      data="{{locations}}"
+      on-data-changed="handleResp"></firebase-collection>
+      <template is="dom-repeat" items={{messages}} as="message">
+      <h4>[[message.data.messagekey]]</h4>
+      <a-listitem foo="[[message.data.messagekey]]"></a-listitem>
+      <span>[[message.afstand]]</span>
       <hr>
     </template>
   </template>
@@ -29,23 +31,80 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 </dom-module>
   <script>
     (function () {
+      var longitude;
+    var latitude;
+
+    function getLocation() {
+    if (navigator.geolocation) {
+        navigator.geolocation.getCurrentPosition(showPosition);
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+};
+
+function showPosition(position) {
+    latitude = position.coords.latitude;
+    longitude = position.coords.longitude;
+    console.log(" LIST Latitude: " + position.coords.latitude + 
+    "<br>Longitude: " + position.coords.longitude); 
+};
+function deg2rad(deg) {
+        return deg * (Math.PI/180)
+      };
+
       Polymer({
         is: 'my-list',
         properties: {
           items: {
             type: Array,
-            notify: true,
+            notify: true
+          },
+          latitude: {
+            observer: '_latitudeChanged'
           }
         },
+
+        CalculateDistance: function(lat1,lon1,lat2,lon2) {
+          var R = 6371; // Radius of the earth in km
+          var dLat = deg2rad(lat2-lat1);  // deg2rad below
+          var dLon = deg2rad(lon2-lon1); 
+          var a = 
+            Math.sin(dLat/2) * Math.sin(dLat/2) +
+            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+            Math.sin(dLon/2) * Math.sin(dLon/2)
+            ; 
+          var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
+          var d = R * c; // Distance in km
+          return d;
+        },
+
         ready: function() {
-        this.items = [
-            'Responsive Web App boilerplate',
-            'Iron Elements and Paper Elements',
-            'End-to-end Build Tooling (including Vulcanize)',
-            'Unit testing with Web Component Tester',
-            'Routing with Page.js',
-            'Offline support with the Platinum Service Worker Elements'
-            ];
+          console.log('ik ben er list');
+          getLocation();
+        },
+
+        handleResp: function(){
+     
+          console.log('got it', this.locations);
+          var messages = [];
+          //var t = this.$.letterheads;
+          for (var i = this.locations.length - 1; i >= 0; i--) {
+
+            // Afstand berekenen
+            afstand = this.CalculateDistance(latitude, longitude, this.locations[i].latitude, this.locations[i].longitude);
+            if(afstand <= 0.1){
+              console.log('ikheb ne vis gevangen');
+              messages.push({'afstand': afstand, 'key': i, 'data': this.locations[i]});
+            };
+          };
+          messages.sort(function(a,b){ return a.afstand - b.afstand});
+          console.log(messages);
+          this.messages = messages;
+        },
+
+        _latitudeChanged: function(){
+          console.log('hey mama', latitude);
+          this.handleResp();
         }
       });
     })();

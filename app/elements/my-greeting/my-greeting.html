@@ -22,9 +22,9 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     </style>
   <template>
     <firebase-collection
-      limit-to-first="3"
       location="https://spreadit.firebaseio.com/messages"
-      data="{{messages}}" id="fbtest"></firebase-collection>
+      id="fbtest"
+      ></firebase-collection>
     <input class="paper-font-body2" value="{{greeting::input}}">
     <button on-tap="saveMess">save</button>
   </template>
@@ -71,8 +71,8 @@ function showPosition(position) {
         //testSave = new Firebase('https://spreadit.firebaseio.com/messages');
         var testID = this.$.fbtest.add({ 'mess': this.greeting, 'latitude': latitude, 'longitude': longitude });
         var newKey = testID.key();
-        var saveLocation = new Firebase('https://spreadit.firebaseio.com/locations/'+newKey+'/');
-        saveLocation.push({"longitude": longitude, "latitude": latitude});
+        var saveLocation = new Firebase('https://spreadit.firebaseio.com/locations/');
+        saveLocation.push({"messagekey": newKey, "longitude": longitude, "latitude": latitude});
 
         //var newID = testSave.__firebaseKey__;
         //console.log(newID);
