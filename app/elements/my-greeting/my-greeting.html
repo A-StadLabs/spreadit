@@ -21,6 +21,10 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
   <template>
+    <firebase-collection
+      limit-to-first="3"
+      location="https://spreadit.firebaseio.com/messages"
+      data="{{messages}}" id="fbtest"></firebase-collection>
     <input class="paper-font-body2" value="{{greeting::input}}">
     <button on-tap="saveMess">save</button>
   </template>
@@ -35,7 +39,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(showPosition);
     } else {
-        x.innerHTML = "Geolocation is not supported by this browser.";
+        console.log("Geolocation is not supported by this browser.");
     }
 };
 
@@ -63,10 +67,15 @@ function showPosition(position) {
       },
 
       saveMess: function(){
-        console.log("SAVE!", this.greeting );
-        testSave = new Firebase("https://spreadit.firebaseio.com/messages");
-        testSave.push({ "mess": this.greeting});
-        console.log(testSave.result);
+        console.log('SAVE!', this.greeting );
+        //testSave = new Firebase('https://spreadit.firebaseio.com/messages');
+        var testID = this.$.fbtest.add({ 'mess': this.greeting, 'latitude': latitude, 'longitude': longitude });
+        var newKey = testID.key();
+        var saveLocation = new Firebase('https://spreadit.firebaseio.com/locations/'+newKey+'/');
+        saveLocation.push({"longitude": longitude, "latitude": latitude});
+
+        //var newID = testSave.__firebaseKey__;
+        //console.log(newID);
       }
     });
 
