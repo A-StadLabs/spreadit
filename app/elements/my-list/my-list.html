@@ -15,16 +15,15 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
   <template>
-    <!-- <firebase-collection
+    <firebase-collection
       limit-to-first="3"
       location="https://spreadit.firebaseio.com/messages"
       data="{{messages}}" ref="" log></firebase-collection>
       <template is="dom-repeat" items="[[messages]]" as="message">
-      <h4>[[message.__firebaseKey__]]</h4>
-      <span>Mess: </span><span>[[message.mess]]</span>
-      <span>Long: </span><span>[[message.longitude]]</span>
-      <span>Lat: </span><span>[[message.latitude]]</span>
-    </template> -->
+      <h4>[[message.mess]]</h4>
+      <span>[[message.__firebaseKey__]]</span>
+      <hr>
+    </template>
   </template>
 
 </dom-module>
