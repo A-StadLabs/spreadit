@@ -1,0 +1,54 @@
+<!--
+@license
+Copyright (c) 2015 The Polymer Project Authors. All rights reserved.
+This code may only be used under the BSD style license found at http://polymer.github.io/LICENSE.txt
+The complete set of authors may be found at http://polymer.github.io/AUTHORS.txt
+The complete set of contributors may be found at http://polymer.github.io/CONTRIBUTORS.txt
+Code distributed by Google as part of the polymer project is also
+subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
+-->
+
+<dom-module id="my-list">
+    <style>
+      :host {
+        display: block;
+      }
+    </style>
+  <template>
+    <firebase-collection
+      order-by-child="height"
+      limit-to-first="3"
+      location="https://spreadit.firebaseio.com/messages"
+      data="{{messages}}" log></firebase-collection>
+      <template is="dom-repeat" items="[[messages]]" as="message">
+      <h4>[[message.__firebaseKey__]]</h4>
+      <span>Mess: </span><span>[[message.mess]]</span>
+      <span>Long: </span><span>[[message.longitude]]</span>
+      <span>Lat: </span><span>[[message.latitude]]</span>
+    </template>
+  </template>
+
+</dom-module>
+  <script>
+    (function () {
+      Polymer({
+        is: 'my-list',
+        properties: {
+          items: {
+            type: Array,
+            notify: true,
+          }
+        },
+        ready: function() {
+        this.items = [
+            'Responsive Web App boilerplate',
+            'Iron Elements and Paper Elements',
+            'End-to-end Build Tooling (including Vulcanize)',
+            'Unit testing with Web Component Tester',
+            'Routing with Page.js',
+            'Offline support with the Platinum Service Worker Elements'
+            ];
+        }
+      });
+    })();
+  </script>
