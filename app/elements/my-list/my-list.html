@@ -48,7 +48,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 // Listen for the event.
 
 // Dispatch the event.
-
+    
 
 
 
@@ -154,6 +154,7 @@ doGeofire: function(key, long, lat){
           window.addEventListener('write', function (iets) { 
             console.log('ik schrijf ',iets.detail);
             that.push('messages', {"mess": iets.detail});  
+            that.uniQify();
           });
 
           console.log(latitude, longitude);
@@ -163,6 +164,12 @@ doGeofire: function(key, long, lat){
 
 
           
+        },
+
+        uniQify: function(){
+          console.log('VOOR uniqufy ',messages);
+          messages = _.uniq(messages, true);
+          console.log('NA uniqufy ',messages);
         },
 
         getVotes: function(){
@@ -213,7 +220,7 @@ doGeofire: function(key, long, lat){
                     messages.push({"key": key, "mess": mess});
                     var event = new CustomEvent('write', { 'detail': {"key": key, "mess": mess} });
 
-                    messages = _.uniq(messages, true);
+                   
 
                     window.dispatchEvent(event);
 
