@@ -11,33 +11,54 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 <dom-module id="my-greeting">
     <style>
       :host {
+        @apply(--layout-vertical);
         display: block;
-        margin: 0px;
-        padding: 0px;
+        margin: 20px 20px 40px 20px;
+        padding: 10px 10px 0px 14px;
+
       }
 
 
       .maininput {
-        width: 60%;
-        margin: 20px 20px 0px 20px;
+        margin-bottom: 10px;
         height: 150px;
         border: 2px solid  #E6E6E6;
         font-family: 'Arvo', serif;
         font-size: 24px;
         background-color: transparent;
-        padding: 10px 10px 0px 14px;
         border-radius: 0px;
         outline: 0;
         border-style:solid;
         -webkit-appearance: none;
             resize: none;
+        width: 60%;
 
       }
 
       .maininput:focus {
         border: 2px solid  #FF5454;
-
       }
+
+
+
+button {
+        border-radius: 0px;
+        outline: 0;
+        border-style:solid;
+        -webkit-appearance: none;
+        background-color: #FF5454;
+        font-family: 'Arvo', serif;
+        font-size: 20px;
+        color: black;
+        border: none;
+        padding: 10px 0px 10px 0px;
+        width: 20%;
+        min-width: 160px;
+
+}
+
+
+
 
       @media (max-width: 600px) {
         h1.paper-font-display1 {
@@ -60,7 +81,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 
     <textarea class="maininput" value="{{greeting::input}}" placeholder="Write your message"></textarea>
 
-    <button on-tap="saveMess">save</button>
+    <button on-tap="saveMess">post</button>
   </template>
 </dom-module>
   <script>

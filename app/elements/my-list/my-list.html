@@ -7,30 +7,92 @@ The complete set of contributors may be found at http://polymer.github.io/CONTRI
 Code distributed by Google as part of the polymer project is also
 subject to an additional IP rights grant found at http://polymer.github.io/PATENTS.txt
 -->
+<link rel="import" href="/bower_components/iron-flex-layout/iron-flex-layout.html">
 
 <dom-module id="my-list">
     <style>
       :host {
         display: block;
-        background-color: #E6E6E6;
+        background-color: #F5F5F5;
+        @apply(--layout-vertical);
+        @apply(--layout-center);
+        font-family: 'Open Sans', sans-serif;
       }
+
+      .message {
+        margin-bottom: 20px;
+
+      }
+
+      .messagebox {
+        border-bottom: 1px solid #E6E6E6;
+        width: 100%;
+        padding-left: 50px;
+        padding-top: 20px;
+        padding-bottom: 20px;
+        font-family: 'Open Sans', sans-serif;
+        font-weight: 400;
+      }
+
+
+      p {
+        margin: 0px;
+        padding: 0px;
+      }
+
+
+      button {
+        border-radius: 5px;
+        outline: 0;
+        border-style:solid;
+        -webkit-appearance: none;
+        background-color: transparent;
+        border: 2px solid #FF5454;
+        color: #FF5454;
+        font-family: 'Arvo', serif;
+        font-size: 12px;
+        padding: 10px;
+      }
+
+      button:hover {
+        background-color:  #FF5454;
+        border: 2px solid #FF5454;
+        color: white;
+      }
+
+.upvotebtn {
+
+}
+
+
+
     </style>
   <template>
+<<<<<<< HEAD
   <p>{{locationpos}}</p>
 
 
 
+=======
+<!--   <p>{{locationpos}}</p>
+ -->
+>>>>>>> origin/master
   <firebase-collection
       location="https://spreadit.firebaseio.com/votes"
       id="fbvote"
       data="{{votes}}"
       ></firebase-collection>
  
-    <h1>messages</h1>
-      <template id="messtemp" is="dom-repeat" items="{{messages}}" as="message">
-      <h4>{{message.mess.mess}}</h4>
-      <button on-tap="vote" id="{{message.mess.key}}">+1</button>
-      <hr>
+<!--     <h1>messages</h1>
+ -->      <template id="messtemp" is="dom-repeat" items="{{messages}}" as="message">
+        <div class="messagebox">
+          <div class="message">
+            <p>{{message.mess.mess}}</p>
+          </div>
+          <div class="upvotebtn end">
+            <button on-tap="vote" id="{{message.mess.key}}">SPREAD!</button>
+          </div>
+       </div>
     </template>
 
   </template>
