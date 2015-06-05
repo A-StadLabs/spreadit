@@ -18,6 +18,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <template>
   <p>{{locationpos}}</p>
 
+
+
   <firebase-collection
       location="https://spreadit.firebaseio.com/votes"
       id="fbvote"
@@ -37,7 +39,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
   <script>
     (function () {
 
- 
 
       var afstand;
       var messages = [];
@@ -45,6 +46,8 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       var longitude;
 
       var build = new Event('build');
+
+
 
 // Listen for the event.
 
@@ -154,7 +157,7 @@ doGeofire: function(key, long, lat){
 
           window.addEventListener('write', function (iets) { 
             console.log('ik schrijf ',iets.detail);
-            that.push('messages', {"mess": iets.detail});  
+            that.push('messages', {"key": iets.detail.key, "mess": iets.detail.mess});  
             that.uniQify();
           });
 
@@ -167,10 +170,12 @@ doGeofire: function(key, long, lat){
           
         },
 
-        uniQify: function(){
-          console.log('VOOR uniqufy ',messages);
-          messages = _.unique(messages, true);
-          console.log('NA uniqufy ',messages);
+        uniQify: function(messsages, key){
+          console.log('VOOR uniqufy ',JSON.stringify(messages));
+          //messages = _(messages).unique;
+          //console.log()
+          messages = _.map(_.difference(messages,key),key);
+          console.log('NA uniqufy ',JSON.stringify(messages));
         },
 
         getVotes: function(){
