@@ -15,42 +15,50 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       }
     </style>
   <template>
-    <firebase-collection
-      limit-to-first="100"
-      location="https://spreadit.firebaseio.com/locations"
-      data="{{locations}}"
-      on-data-changed="handleResp"></firebase-collection>
-      <template is="dom-repeat" items={{messages}} as="message">
-      <h4>[[message.data.messagekey]]</h4>
-      <a-listitem foo="[[message.data.messagekey]]"></a-listitem>
-      <span>[[message.afstand]]</span>
+  <p>{{locationpos}}</p>
+
+  <firebase-collection
+      location="https://spreadit.firebaseio.com/votes"
+      id="fbvote"
+      data="{{votes}}"
+      ></firebase-collection>
+ 
+    <h1>messages</h1>
+      <template id="messtemp" is="dom-repeat" items="{{messages}}" as="message">
+      <h4>{{message.mess.mess}}</h4>
+      <button on-tap="vote" id="{{message.mess.key}}">+1</button>
       <hr>
     </template>
+
   </template>
 
 </dom-module>
   <script>
     (function () {
+
+ 
+
+      var afstand;
+      var messages = [];
+      var latitude;
       var longitude;
-    var latitude;
 
-    function getLocation() {
-    if (navigator.geolocation) {
-        navigator.geolocation.getCurrentPosition(showPosition);
-    } else {
-        console.log("Geolocation is not supported by this browser.");
-    }
-};
+      var build = new Event('build');
 
-function showPosition(position) {
+// Listen for the event.
+
+// Dispatch the event.
+
+
+
+
+    function showPosition(position) {
+    //    var that = this;
     latitude = position.coords.latitude;
     longitude = position.coords.longitude;
-    console.log(" LIST Latitude: " + position.coords.latitude + 
-    "<br>Longitude: " + position.coords.longitude); 
+    window.dispatchEvent(build);
 };
-function deg2rad(deg) {
-        return deg * (Math.PI/180)
-      };
+
 
       Polymer({
         is: 'my-list',
@@ -61,16 +69,72 @@ function deg2rad(deg) {
           },
           latitude: {
             observer: '_latitudeChanged'
-          }
+          },
+          locationpos: {
+            type: Boolean,
+            value: false
+          },
+          messages: {
+            type: Array,
+            value: []
+          }    
         },
 
+      
+
+
+      vote: function(e){
+        //console.log(event, detail, sender);
+        console.log(e.target.id);
+        var newKey = e.target.id;
+        // Add ne vote op de nieuwe locatie
+        var geoID = this.$.fbvote.add({ 'messageid': newKey, 'value': '1' });
+
+        var geoKey = geoID.key();
+        this.doGeofire(geoKey, longitude, latitude);
+      },
+       
+
+     getLocation: function() {
+      var that = this;
+      
+      
+    if (navigator.geolocation) {
+        this.locpos = navigator.geolocation.getCurrentPosition(showPosition);
+        //console.log(this.locpos);
+        
+        //this.locationpos = true;
+    } else {
+        console.log("Geolocation is not supported by this browser.");
+    }
+},
+
+doGeofire: function(key, long, lat){
+  var firebaseRef = new Firebase('https://spreadit.firebaseio.com/geopoints/');
+          var geoFire = new GeoFire(firebaseRef);
+          geoFire.set(key, [lat, long]).then(function() {
+  console.log("Provided key has been added to GeoFire");
+}, function(Error) {
+  console.log("Error: " + error);
+});
+},
+
+
+
+
+
+ deg2rad: function(deg) {
+        return deg * (Math.PI/180)
+      },
+
         CalculateDistance: function(lat1,lon1,lat2,lon2) {
+          console.log(lat1, lon1, lat2, lon2);
           var R = 6371; // Radius of the earth in km
-          var dLat = deg2rad(lat2-lat1);  // deg2rad below
-          var dLon = deg2rad(lon2-lon1); 
+          var dLat = this.deg2rad(lat2-lat1);  // this.deg2rad below
+          var dLon = this.deg2rad(lon2-lon1); 
           var a = 
             Math.sin(dLat/2) * Math.sin(dLat/2) +
-            Math.cos(deg2rad(lat1)) * Math.cos(deg2rad(lat2)) * 
+            Math.cos(this.deg2rad(lat1)) * Math.cos(this.deg2rad(lat2)) * 
             Math.sin(dLon/2) * Math.sin(dLon/2)
             ; 
           var c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1-a)); 
@@ -79,33 +143,115 @@ function deg2rad(deg) {
         },
 
         ready: function() {
+          var that = this;
+          
+
+          window.addEventListener('build', function () { 
+            that.locationpos = true; 
+            that.getVotes();
+          });
+
+          window.addEventListener('write', function (iets) { 
+            console.log('ik schrijf ',iets.detail);
+            that.push('messages', {"mess": iets.detail});  
+          });
+
+          console.log(latitude, longitude);
+          this.locationpos = false;
           console.log('ik ben er list');
-          getLocation();
+          this.getLocation();
+
+
+          
         },
 
-        handleResp: function(){
-     
-          console.log('got it', this.locations);
-          var messages = [];
-          //var t = this.$.letterheads;
-          for (var i = this.locations.length - 1; i >= 0; i--) {
+        getVotes: function(){
 
-            // Afstand berekenen
-            afstand = this.CalculateDistance(latitude, longitude, this.locations[i].latitude, this.locations[i].longitude);
-            if(afstand <= 0.1){
-              console.log('ikheb ne vis gevangen');
-              messages.push({'afstand': afstand, 'key': i, 'data': this.locations[i]});
-            };
-          };
-          messages.sort(function(a,b){ return a.afstand - b.afstand});
-          console.log(messages);
-          this.messages = messages;
-        },
+          console.log('get votes');
 
-        _latitudeChanged: function(){
-          console.log('hey mama', latitude);
-          this.handleResp();
+          var that = this;
+
+          var fbgeopoints = new Firebase('https://spreadit.firebaseio.com/geopoints/');
+
+          var fbvotes = new Firebase('https://spreadit.firebaseio.com/votes/');
+
+          var fbmessages = new Firebase('https://spreadit.firebaseio.com/messages/');
+
+          var geoFire = new GeoFire(fbgeopoints);
+
+          //console.log(fbvotes);
+
+          var myLocation = [latitude, longitude];
+
+          console.log(myLocation);
+
+          var geoQuery = geoFire.query({
+            center: myLocation,
+            radius: 0.025
+          });
+
+          var votesInQuery = {};
+
+          geoQuery.on("ready", function() {
+            console.log('geofire is ready');
+          });
+
+          geoQuery.on("key_entered", function(voteId, voteLocation, voteDistance) {
+            console.log('er is iets: ',voteId, voteLocation, voteDistance);
+            //voteId = voteId.split(":")[1];
+            //votesInQuery[voteId] = true;
+
+             fbvotes.child(voteId).once("value", function(dataSnapshot) {
+               // Get the vehicle data from the Open Data Set
+              var messageid = dataSnapshot.val().messageid;
+
+                fbmessages.child(messageid).once("value", function(dataSnapshot){
+
+                    var mess = dataSnapshot.val().mess;
+                    var key = dataSnapshot.key();
+
+                    messages.push({"key": key, "mess": mess});
+                    var event = new CustomEvent('write', { 'detail': {"key": key, "mess": mess} });
+
+                    messages = _.uniq(messages, true);
+
+                    window.dispatchEvent(event);
+
+                    console.log(messages)
+                });
+
+            });
+          });
+
+          geoQuery.on("key_exited", function(voteId, voteLocation, voteDistance) {
+            console.log('er is iets: ',voteId, voteLocation, voteDistance);
+            // voteId = voteId.split(":")[1];
+            // votesInQuery[voteId] = true;
+
+            // fbmessages.child(voteId).once("value", function(dataSnapshot) {
+            //   // Get the vehicle data from the Open Data Set
+            //   vehicle = dataSnapshot.val();
+            //   console.log(dataSnapshot.val());
+
+            // });
+          });
+
+          geoQuery.on("key_moved", function(voteId, voteLocation, voteDistance) {
+            console.log('er is iets: ',voteId, voteLocation, voteDistance);
+            // voteId = voteId.split(":")[1];
+            // votesInQuery[voteId] = true;
+
+            // fbmessages.child(voteId).once("value", function(dataSnapshot) {
+            //   // Get the vehicle data from the Open Data Set
+            //   vehicle = dataSnapshot.val();
+            //   console.log(dataSnapshot.val());
+
+            // });
+          });
+
         }
+
+      
       });
     })();
   </script>

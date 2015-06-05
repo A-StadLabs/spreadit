@@ -52,6 +52,12 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
       data="{{messages}}"
       ></firebase-collection>
 
+      <firebase-collection
+      location="https://spreadit.firebaseio.com/votes"
+      id="fbvote"
+      data="{{votes}}"
+      ></firebase-collection>
+
     <textarea class="maininput" value="{{greeting::input}}" placeholder="Write your message"></textarea>
 
     <button on-tap="saveMess">save</button>
@@ -83,11 +89,7 @@ function showPosition(position) {
       is: 'my-greeting',
 
       properties: {
-        greeting: {
-          type: String,
-          value: 'Welcome',
-          notify: true
-        }
+        
       },
 
       ready: function(){
@@ -97,14 +99,28 @@ function showPosition(position) {
       saveMess: function(){
         console.log('SAVE!', this.greeting );
         //testSave = new Firebase('https://spreadit.firebaseio.com/messages');
-        var testID = this.$.fbtest.add({ 'mess': this.greeting, 'latitude': latitude, 'longitude': longitude });
+        var testID = this.$.fbtest.add({ 'mess': this.greeting });
         var newKey = testID.key();
-        var saveLocation = new Firebase('https://spreadit.firebaseio.com/locations/');
-        saveLocation.push({"messagekey": newKey, "longitude": longitude, "latitude": latitude});
 
-        //var newID = testSave.__firebaseKey__;
-        //console.log(newID);
-      }
+        
+
+        var geoID = this.$.fbvote.add({ 'messageid': newKey, 'value': '1' });
+
+        var geoKey = geoID.key();
+
+        this.doGeofire(geoKey, longitude, latitude);
+
+      },
+
+      doGeofire: function(key, long, lat){
+  var firebaseRef = new Firebase('https://spreadit.firebaseio.com/geopoints/');
+          var geoFire = new GeoFire(firebaseRef);
+          geoFire.set(key, [lat, long]).then(function() {
+  console.log("Provided key has been added to GeoFire");
+}, function(Error) {
+  console.log("Error: " + error);
+});
+}
     });
 
 

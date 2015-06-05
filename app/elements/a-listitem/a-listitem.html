@@ -9,10 +9,6 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
 -->
 
 <link rel="import" href="../../bower_components/polymer/polymer.html">
-<link rel="import" href="../../bower_components/firebase-element/firebase.html">
-<link rel="import" href="../../bower_components/firebase-element/firebase-collection.html">
-  <link rel="import" href="../../bower_components/firebase-element/firebase-document.html">
-<link rel="import" href="../../bower_components/firebase-element/firebase-query-behavior.html">
 
 <dom-module id="a-listitem">
   <style>
@@ -21,10 +17,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     }
   </style>
   <template>
-    <firebase-collection
-      location="https://spreadit.firebaseio.com/messages/{{foo}}"
-      data="{{message}}" log></firebase-collection>
-    <div>Hello from <span>{{message.mess}}</span></div>
+    <div>Hello from <span>{{foo}}</span></div>
   </template>
 </dom-module>
 <script>
@@ -35,7 +28,7 @@ subject to an additional IP rights grant found at http://polymer.github.io/PATEN
     properties: {
       foo: {
         type: String,
-        //value: 'bar',
+        value: 'bar',
         notify: true
       }
     }
